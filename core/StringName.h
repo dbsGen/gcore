@@ -14,7 +14,7 @@ namespace gcore {
     class Class;
     
     class StringName {
-        BASE_CLASS_DEFINE
+    BASE_FINAL_CLASS_DEFINE
         
     private:
         

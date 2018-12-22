@@ -32,11 +32,11 @@ namespace gcore {
             TypeLongLong,
             TypeFloat,
             TypeDouble,
+            TypeMemory,
+            TypeStringName,
             TypePointer,
             TypeObject,
-            TypeStringName,
             TypeReference,
-            TypeMemory
         ENUM_END
 
         typedef union {
@@ -78,8 +78,7 @@ namespace gcore {
         }
 
         Variant(const Variant &other) : Variant() {
-            value.v_pointer = other.value.v_pointer;
-            retain(value, other.class_type, other.type);
+            retain(other.value, other.class_type, other.type);
         }
 
         
@@ -95,12 +94,22 @@ namespace gcore {
         _FORCE_INLINE_ T *get() const {
             return (T*)operator void *();
         }
+        template <class T>
+        _FORCE_INLINE_ void getMemory(T &var) const {
+            if (type == TypeMemory && T::getClass() == class_type) {
+                var = *(T*)value.v_pointer;
+            }
+        }
+
+        template <typename T>
+        static Variant memoryVar(const T *target) {
+            Variant v;
+            v.retain(u_value{v_pointer: (void*)target}, T::getClass(), TypeMemory);
+            return v;
+        }
 
 //        void operator=(const HObject *object);
         void operator=(const Variant &other) {
-            retain(other.value, other.class_type, other.type);
-        }
-        void operator=(Variant &&other) {
             release();
             retain(other.value, other.class_type, other.type);
         }
@@ -120,12 +129,6 @@ namespace gcore {
         _FORCE_INLINE_ bool isRef() const { return isRef(type); }
         _FORCE_INLINE_ bool empty() const { return type == TypeNull || (type >= TypePointer && value.v_pointer == NULL); }
 
-        template <typename T>
-        static Variant var(const T *target) {
-            Variant v;
-            v.retain(u_value{v_pointer: (void*)target}, T::getClass());
-            return v;
-        }
 
         operator bool() const;
         operator char() const;

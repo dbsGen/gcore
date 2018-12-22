@@ -69,7 +69,7 @@ namespace gcore {
         }
 
         _FORCE_INLINE_ Variant &operator[](long n) {
-            return variants.at(n);
+            return variants[n];
         }
         _FORCE_INLINE_ const Variant &operator[](long n) const {
             return at(n);
@@ -132,7 +132,8 @@ namespace gcore {
 
     public:
         _FORCE_INLINE_ RArray() : Ref(new _Array(variant_vector())) {}
-        _FORCE_INLINE_ RArray(const variant_vector &variants) : Ref(new _Array(variants)) {}
+        _FORCE_INLINE_ RArray(const variant_vector &variants) : Ref(new _Array(variants)) {
+        }
         _FORCE_INLINE_ RArray(std::initializer_list<variant_vector::value_type> list) : Ref(new _Array(list)) {}
         _FORCE_INLINE_ RArray(const Reference &ref) : Ref(ref) {}
 

@@ -4,6 +4,7 @@
 #include <core/Array.h>
 #include <vector>
 #include <core/Callback.h>
+#include <core/math/Type.h>
 
 using namespace gcore;
 
@@ -17,7 +18,10 @@ int main() {
     obj->callArgs("setIntValue", 1023);
     printf("int value is %d -> %d\n", (int)obj->call("getIntValue"), obj->getIntValue());
 
-    printf("Ref size %d\n", sizeof(Variant));
+#define PrintSize(CLASS) printf(#CLASS " size %d\n", sizeof(CLASS))
+    PrintSize(StringName);
+
+    PrintSize(Vector3f);
 
     RCallback cb = C([](int l){
         printf("output %d\n", l);
@@ -39,6 +43,14 @@ int main() {
     cb2(2883, obj);
     cb2("nihao");
     cb2(obj);
+
+    Vector2f v2(2,3);
+    Vector3f v3(2,3,4);
+    RCallback cb3 = C([](Vector2f v){
+        printf("v(%f,%f)\n",v.x(), v.y());
+    });
+    cb3(v2);
+    cb3(v3);
 
     return 0;
 }

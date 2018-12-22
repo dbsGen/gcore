@@ -8,7 +8,6 @@
 #include "../Object.h"
 #include "../StringName.h"
 #include "../Variant.h"
-#include "../Pointer.h"
 #include "../core_define.h"
 
 namespace gcore {

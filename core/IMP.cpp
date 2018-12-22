@@ -20,7 +20,6 @@
 #include "script/Script.h"
 #include "Array.h"
 #include "Hash.h"
-#include "Pointer.h"
 #include "Data.h"
 #include "Map.h"
 #include "math/Math.hpp"
@@ -203,8 +202,7 @@ bool Object::copy(const Object *other) {
 }
 
 Variant Object::var()  {
-    Pointer p(this);
-    return Variant(&p);
+    return Variant(this);
 }
 
 
@@ -388,8 +386,6 @@ void Variant::retain(const u_value &value, const Class *class_type, int8_t type)
             type = TypeFloat;
         }else if (class_type == Double::getClass()) {
             type = TypeDouble;
-        }else if (class_type == Pointer::getClass()) {
-            type = TypePointer;
         }else if (class_type == StringName::getClass()) {
             type = TypeStringName;
         }else if (class_type->isTypeOf(RefObject::getClass())) {
@@ -397,7 +393,7 @@ void Variant::retain(const u_value &value, const Class *class_type, int8_t type)
         }else if (class_type->isTypeOf(Object::getClass())) {
             type = TypeObject;
         }else {
-            type = TypeMemory;
+            type = TypePointer;
         }
     }
     switch (type) {
@@ -469,7 +465,7 @@ Variant::Variant(const Object *obj) : Variant() {
 
 Variant::Variant(void *ptr) : Variant() {
     if (ptr) {
-        retain(u_value{v_pointer: ptr}, Pointer::getClass());
+        retain(u_value{v_pointer: ptr}, NULL);
     }
 }
 
@@ -531,8 +527,7 @@ Variant::Variant(const char *str) : Variant() {
 }
 
 Variant ptr(void *pointer) {
-    Pointer p(pointer);
-    return Variant(&p);
+    return Variant(pointer);
 }
 
 void Reference::release() {
@@ -968,6 +963,3 @@ BASE_CLASS_IMPLEMENT(LongLong)
 BASE_CLASS_IMPLEMENT(Float)
 BASE_CLASS_IMPLEMENT(Double)
 BASE_CLASS_IMPLEMENT(Boolean)
-
-
-BASE_CLASS_IMPLEMENT(Pointer)

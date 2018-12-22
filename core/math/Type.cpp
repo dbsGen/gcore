@@ -6,8 +6,6 @@
 
 using namespace gcore;
 
-Vector2f Vector2f::_zero;
-
 BASE_CLASS_IMPLEMENT(Vector2i)
 BASE_CLASS_IMPLEMENT(Vector3i)
 BASE_CLASS_IMPLEMENT(Vector4i)

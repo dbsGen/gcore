@@ -9,6 +9,7 @@
 #include "../Object.h"
 #include "../core_define.h"
 #include <cstring>
+#include <sstream>
 
 namespace gcore {
 #define VECTOR_DEF(T, S, current_type) \
@@ -43,13 +44,13 @@ _FORCE_INLINE_ current_type &operator+=(const current_type &other) { \
     for (int i = 0; i < S; ++i) { \
         v[i] += other.v[i]; \
     } \
-    return *(current_type*)this; \
+    return *((current_type*)this); \
 } \
 _FORCE_INLINE_ current_type &operator*=(float scale) { \
     for (int i = 0; i < S; ++i) { \
         v[i] *= scale; \
     } \
-    return *(current_type*)this; \
+    return *((current_type*)this); \
 } \
 _FORCE_INLINE_ current_type scale(float scale) const { \
     current_type n; \
@@ -62,7 +63,7 @@ _FORCE_INLINE_ current_type &operator-=(const current_type &other) { \
     for (int i = 0; i < S; ++i) { \
         v[i] -= other.v[i]; \
     } \
-    return *(current_type*)this; \
+    return *((current_type*)this); \
 } \
 _FORCE_INLINE_ current_type operator+(const current_type &other) const { \
     current_type n; \
@@ -153,6 +154,18 @@ protected: \
 _FORCE_INLINE_ void _copy(const Object *other) { \
     operator=(*(current_type*)other); \
 } \
+public:\
+_FORCE_INLINE_ std::string str() { \
+    std::stringstream ss; \
+    ss << #current_type; \
+    ss << "("; \
+    for (int i = 0; i < S; ++i) { \
+        if (i != 0) ss << ','; \
+        ss << v[i]; \
+    } \
+    ss << ")"; \
+    return ss.str();\
+} \
 private:
     
     class Vector2i {
@@ -215,8 +228,8 @@ private:
     };
     class Vector2f {
         VECTOR_DEF(float, 2, Vector2f);
-        static Vector2f _zero;
     public:
+
         INITIALIZE(Vector2f, PARAMS(float x, float y),
                    v[0] = x;
                    v[1] = y;
@@ -229,11 +242,7 @@ private:
         
         _FORCE_INLINE_ void x(float x) { v[0] = x;}
         _FORCE_INLINE_ void y(float y) { v[1] = y;}
-        
-        _FORCE_INLINE_ static const Vector2f &zero() {
-            return _zero;
-        }
-        
+
         SUPPORT_VARIANT(Vector2f);
     };
     
@@ -340,6 +349,9 @@ private:
             memcpy(&m, &other.m, sizeof(m));
             return *this;
         }
+        std::string str() {
+            return "Matrix2";
+        }
         SUPPORT_VARIANT(Matrix2);
     };
     class Matrix3 {
@@ -390,6 +402,10 @@ private:
         Vector4f rotation() const;
 
         Matrix3 invert();
+
+        std::string str() {
+            return "Matrix3";
+        }
         static Matrix3 identity();
         _FORCE_INLINE_ Matrix3& operator=(const Matrix3 &other) {
             memcpy(&m, &other.m, sizeof(m));
@@ -481,6 +497,10 @@ private:
         Vector4f rotation() const;
         Vector3f scale() const;
         Matrix4 transpose() const;
+
+        std::string str() {
+            return "Matrix4";
+        }
         
         SUPPORT_VARIANT(Matrix4);
     };
