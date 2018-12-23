@@ -12,7 +12,7 @@ set(CORE_SRC
 
 add_library(gcore STATIC ${CORE_SRC})
 
-project(grender_test)
+project(gcore_test)
 
 link_libraries(gcore)
 
@@ -27,5 +27,5 @@ include_directories(".")
 
 set(TEST_SRC test/main.cpp test/TestObject.cpp test/TestObject.h)
 
-add_executable(grender_test ${TEST_SRC})
+add_executable(gcore_test ${TEST_SRC})
 
