@@ -12,6 +12,14 @@ using namespace gcore;
 
 #define STR(S) #S
 
+TEST(Class, ClassRelationships)
+{
+    EXPECT_EQ(TestObject::getClass()->getParent(), RefObject::getClass());
+    EXPECT_TRUE(TestObject::getClass()->isTypeOf(RefObject::getClass()));
+    EXPECT_TRUE(TestObject::getClass()->isSubclassOf(RefObject::getClass()));
+    EXPECT_FALSE(TestObject::getClass()->isSubclassOf(TestObject::getClass()));
+}
+
 TEST(Object, NameOfTestObject)
 {
     Ref<TestObject> obj(new TestObject());
@@ -68,8 +76,8 @@ TEST(Callback, Params)
             EXPECT_EQ(clz, nullptr);
         }
     });
-    clz = NULL;                     cb2(30.32);
-    clz = NULL;                     cb2(2883, obj);
+    clz = nullptr;                  cb2(30.32);
+    clz = nullptr;                  cb2(2883, obj);
     clz = _String::getClass();      cb2("nihao");
     clz = TestObject::getClass();   cb2(obj);
 
@@ -86,6 +94,14 @@ TEST(Callback, ParamsTransform)
     });
     test_v2 = v2;           cb3(v2);
     test_v2 = Vector2f();   cb3(v3);
+}
+
+TEST(Size, ObjectMinnumSize)
+{
+    EXPECT_EQ(sizeof(StringName), 8);
+    EXPECT_EQ(sizeof(Reference), 8);
+    EXPECT_EQ(sizeof(Ref<TestObject>), 8);
+    EXPECT_EQ(sizeof(Variant), 24);
 }
 
 int main(int argc, char* argv[]) {
