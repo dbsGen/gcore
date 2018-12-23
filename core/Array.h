@@ -149,7 +149,7 @@ namespace gcore {
             return Variant(*this);
         }
         RArray(const Variant &var) : RArray() {
-            if (var && var.getType()->isTypeOf(_Array::getClass())) {
+            if (var && var.getTypeClass()->isTypeOf(_Array::getClass())) {
                 operator=(var.ref());
             }else {
                 operator*()->push_back(var);

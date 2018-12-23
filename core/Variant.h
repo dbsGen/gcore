@@ -120,7 +120,8 @@ namespace gcore {
             return get();
         }
 
-        const Class *getType() const;
+        const Class *getTypeClass() const;
+        Type getType() const;
 
         _FORCE_INLINE_ Reference ref() const {
             return isRef() ? Reference((Object*)value.v_pointer) : Reference();

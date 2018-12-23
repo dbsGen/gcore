@@ -273,8 +273,8 @@ T trans_target2(Variant::u_value value, Variant::Type type) {
 }
 
 bool Variant::operator==(const Variant &other) const {
-    const Class *type = getType();
-    if (type == other.getType()) {
+    const Class *type = getTypeClass();
+    if (type == other.getTypeClass()) {
         if (type == Char::getClass()) {
             return operator char () == (char)other;
         }else if (type == Short::getClass()) {
@@ -330,7 +330,7 @@ Variant::operator void *() const {
 }
 
 Variant::operator StringName() const {
-    const Class *type = getType();
+    const Class *type = getTypeClass();
     if (type->isTypeOf(StringName::getClass())) {
         return *get<StringName>();
     }else if (type->isTypeOf(_String::getClass())){
@@ -340,7 +340,7 @@ Variant::operator StringName() const {
     return StringName::null();
 }
 
-const Class* Variant::getType() const {
+const Class* Variant::getTypeClass() const {
     switch (type) {
         case TypeObject:
         case TypeReference: {
@@ -350,6 +350,9 @@ const Class* Variant::getType() const {
             return class_type;
         }
     }
+}
+Variant::Type Variant::getType() const {
+    return type;
 }
 
 void Variant::release() {
@@ -566,6 +569,8 @@ Reference::Reference(const Variant &other) {
         const Reference &r = other.ref();
         ptr = r.ptr;
         retain();
+    }else {
+        ptr = NULL;
     }
 }
 
@@ -949,6 +954,10 @@ void *gcore::h(const char *chs) {
 
 
 void ClassDB::loadClasses() {
+    Object::getClass();
+    Callback::getClass();
+    _Array::getClass();
+    _Map::getClass();
 }
 
 StringName StringName::_null;

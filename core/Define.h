@@ -223,7 +223,7 @@ _FORCE_INLINE_ virtual const __CLASS_NS(Class) *getInstanceClass() const { \
     return Variant::memoryVar(this); \
 } \
 _FORCE_INLINE_ TYPE(const Variant &var) : TYPE() { \
-    if (var.getType()->isTypeOf(TYPE::getClass())) var.getMemory(*this); \
+    if (var.getTypeClass()->isTypeOf(TYPE::getClass())) var.getMemory(*this); \
 }
 
 

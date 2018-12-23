@@ -13,10 +13,10 @@
 
 namespace gcore {
     template <class T>
-    CLASS_BEGIN_NV(Singleton, HObject)
+    CLASS_BEGIN_NV(Singleton, Object)
     private:
         static T *instance;
-        static mutex mtx;
+        static std::mutex mtx;
     protected:
         Singleton(){}
     public:
@@ -30,7 +30,7 @@ namespace gcore {
             return instance;
         }
     protected:
-        ON_LOADED_BEGIN(cls, HObject)
+        ON_LOADED_BEGIN(cls, Object)
             ADD_METHOD(cls, Singleton, getInstance);
         ON_LOADED_END
     CLASS_END
@@ -38,7 +38,7 @@ namespace gcore {
     template <class T>
     T *Singleton<T>::instance = NULL;
     template <class T>
-    mutex Singleton<T>::mtx;
+    std::mutex Singleton<T>::mtx;
 }
 
 
