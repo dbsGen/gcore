@@ -16,6 +16,11 @@ project(grender_test)
 
 link_libraries(gcore)
 
+link_directories("test/libs")
+include_directories("test/include")
+
+link_libraries(gcore gmock gtest)
+
 add_definitions(-DUSING_SCRIPT)
 
 include_directories(".")
