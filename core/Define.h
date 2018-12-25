@@ -279,13 +279,13 @@ _FORCE_INLINE_ CLASS(PARAMS):CLASS(){PROGRAMS}
 #define variant_map     std::map<void*, gcore::Variant>
 #define ref_map         std::map<void*, gcore::Reference>
 #define pointer_vector  std::vector<void*>
-#define variant_vector  std::vector<Variant>
+#define variant_vector  std::vector<gcore::Variant>
 #define float_vector    std::vector<float>
-#define ref_vector      std::vector<Reference>
+#define ref_vector      std::vector<gcore::Reference>
 #define b8_vector       std::vector<u_int8_t>
 #define pointer_list    std::list<void*>
-#define ref_list        std::list<Reference>
-#define variant_list    std::list<Variant>
+#define ref_list        std::list<gcore::Reference>
+#define variant_list    std::list<gcore::Variant>
 
 #define b8_mask     0xff
 #define b16_mask    0xffff

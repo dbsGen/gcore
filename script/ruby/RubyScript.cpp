@@ -144,7 +144,7 @@ gcore::Variant ruby_r2h(mrb_state *mrb, mrb_value v) {
         {
             mrb_value val = mrb_attr_get(mrb, v, sym_native_instance);
             if (mrb_nil_p(val)) {
-                RubyNativeObject *no = new RubyNativeObject(mrb_obj_ptr(v));
+                RubyNativeObject *no = new RubyNativeObject(mrb, mrb_obj_ptr(v));
                 return gcore::Variant(gcore::Reference(no));
             }else {
                 RubyInstance *cinst = (RubyInstance *)DATA_PTR(val);
@@ -160,7 +160,7 @@ gcore::Variant ruby_r2h(mrb_state *mrb, mrb_value v) {
         {
             mrb_value val = mrb_iv_get(mrb, v, sym_native_class);
             if (mrb_nil_p(val)) {
-                RubyNativeObject *no = new RubyNativeObject(mrb_obj_ptr(v));
+                RubyNativeObject *no = new RubyNativeObject(mrb, mrb_obj_ptr(v));
                 return gcore::Variant(gcore::Reference(no));
             }else {
                 RubyClass *ccls = (RubyClass *)mrb_cptr(val);
@@ -198,7 +198,6 @@ gcore::Variant ruby_r2h(mrb_state *mrb, mrb_value v) {
         }
             
         default:
-            // TODO hash proc
             return gcore::Variant((void*)mrb_ptr(v));
     }
 }
@@ -553,6 +552,25 @@ gcore::ScriptInstance *RubyClass::makeInstance() const {
     return new RubyInstance;
 }
 
+
+gcore::Variant RubyScript::call(const gcore::StringName &name, const gcore::Variant **params, int count) const {
+    if (mrb->exc) mrb->exc = NULL;
+    if (mrb_respond_to(mrb, mrb_obj_value(mrb->top_self), mrb_intern_cstr(mrb, name.str()))) {
+        mrb_value *vs = (mrb_value *)malloc(count * sizeof(mrb_value));
+        for (int i = 0; i < count; ++i) {
+            vs[i] = ruby_h2r(mrb, *params[i]);
+        }
+        mrb_value ret = mrb_funcall_argv(mrb, mrb_obj_value(mrb->top_self), mrb_intern_cstr(mrb, name.str()), count, vs);
+        free(vs);
+        if (ret.tt == MRB_TT_EXCEPTION) {
+            mrb_p(mrb, ret);
+            mrb->exc = NULL;
+        }
+        return ruby_r2h(mrb, ret);
+    }
+    return gcore::Variant::null();
+}
+
 gcore::Variant RubyClass::apply(const gcore::StringName &name, const gcore::Variant **params, int count) const {
     mrb_state *mrb = ((RubyScript*)getScript())->getMRB();
     if (mrb->exc) mrb->exc = NULL;
@@ -610,16 +628,37 @@ void RubyNativeObject::setNative(void *native) {
     }
 }
 
-RubyNativeObject::RubyNativeObject(void *native) {
+RubyNativeObject::RubyNativeObject(mrb_state *mrb, struct RObject *native) : NativeObject() {
+    this->mrb = mrb;
     setNative(native);
 }
 
 RubyNativeObject::~RubyNativeObject() {
     if (getNative()) {
-        RubyScript *script = (RubyScript*)gcore::Script::get("ruby");
-        if (script) {
-            mrb_gc_register(script->getMRB(), mrb_obj_value(getNative()));
+        if (mrb) {
+            mrb_gc_register(mrb, mrb_obj_value(getNative()));
         }
     }
 }
 
+void RubyNativeObject::apply(const gcore::StringName &name, gcore::Variant *result, const gcore::Variant **params, int count) {
+
+    if (mrb->exc) mrb->exc = NULL;
+    if (mrb_respond_to(mrb, mrb_obj_value(getInstance()), mrb_intern_cstr(mrb, name.str()))) {
+        mrb_value *vs = (mrb_value *)malloc(count * sizeof(mrb_value));
+        for (int i = 0; i < count; ++i) {
+            vs[i] = ruby_h2r(mrb, *params[i]);
+        }
+        mrb_value ret = mrb_funcall_argv(mrb, mrb_obj_value(getInstance()), mrb_intern_cstr(mrb, name.str()), count, vs);
+        free(vs);
+        if (ret.tt == MRB_TT_EXCEPTION) {
+            mrb_p(mrb, ret);
+            mrb->exc = NULL;
+        }
+        *result = ruby_r2h(mrb, ret);
+        return;
+    }else {
+        LOG(w, "can not applay %s", name.str());
+    }
+    *result =  gcore::Variant::null();
+}

@@ -46,6 +46,7 @@ namespace gscript {
         void addEnvPath(const char *path);
         gcore::Variant run(const char *filepath) const;
         gcore::Variant runScript(const char *script) const;
+        gcore::Variant call(const gcore::StringName &name, const gcore::Variant **params, int count) const;
         _FORCE_INLINE_ mrb_state *getMRB() {
             return mrb;
         }
@@ -85,11 +86,22 @@ namespace gscript {
     CLASS_END
     
     CLASS_BEGIN_N(RubyNativeObject, gcore::NativeObject)
-public:
-    _FORCE_INLINE_ RubyNativeObject() {}
-    RubyNativeObject(void *native);
-    virtual void setNative(void *native);
-    ~RubyNativeObject();
+
+        mrb_state *mrb;
+
+        _FORCE_INLINE_ struct RObject *getInstance() {
+            return static_cast<struct RObject *>(getNative());
+        }
+
+    public:
+        RubyNativeObject(){}
+        RubyNativeObject(mrb_state *mrb, struct RObject *native);
+
+        virtual void setNative(void *native);
+        ~RubyNativeObject();
+
+        virtual void apply(const gcore::StringName &name, gcore::Variant *result = NULL, const gcore::Variant **params = NULL, int count = 0);
+
     CLASS_END
 }
 

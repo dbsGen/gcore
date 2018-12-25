@@ -71,13 +71,29 @@ namespace gcore {
         void removeScript(ScriptInstance *instance);
         void clearScripts();
 #ifdef USING_SCRIPT
-        void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0);
+        virtual void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0);
 #else
-        _FORCE_INLINE_ void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0) {}
+        _FORCE_INLINE_ virtual void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0) {}
 #endif
         Variant apply(const StringName &name, const pointer_vector &params) {
             Variant ret;
             apply(name, &ret, (const Variant **)params.data(), (int)params.size());
+            return ret;
+        }
+        template<typename ...ARGS>
+        Variant applyArgs(const StringName &name, ARGS &&...args) {
+            const int size = sizeof...(ARGS);
+            Variant ret;
+            if (size) {
+                variant_vector vs{{args...}};
+                pointer_vector pv;
+                for (int i = 0; i < size; ++i) {
+                    pv.push_back(&vs[i]);
+                }
+                apply(name, &ret, (const Variant **)pv.data(), (int)pv.size());
+            }else {
+                apply(name, &ret);
+            }
             return ret;
         }
         void call(const StringName &name, Variant *result, const Variant **params = NULL, int count = 0);

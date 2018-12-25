@@ -20,16 +20,15 @@ namespace gcore {
 
         void *native;
     public:
+
         _FORCE_INLINE_ virtual void setNative(void *native) {
             this->native = native;
         }
         _FORCE_INLINE_ virtual void *getNative() {
             return native;
         }
+
         _FORCE_INLINE_ NativeObject() : native(NULL) {}
-        INITIALIZE(NativeObject, void *native,
-            this->native = native;
-        )
 
     CLASS_END
 }
