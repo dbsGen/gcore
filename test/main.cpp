@@ -4,7 +4,6 @@
 #include <core/Array.h>
 #include <vector>
 #include <core/Callback.h>
-#include <core/math/Type.h>
 #include <script/ruby/RubyScript.h>
 
 #include <gtest/gtest.h>
@@ -50,15 +49,6 @@ TEST(Variant, Transform)
     Variant f_variant(30.32);
     EXPECT_EQ((int)f_variant, 30);
 
-    Variant v2_variant(Vector2f(2,3));
-    Vector2f vec2 = v2_variant;
-    Vector3f vec3 = v2_variant;
-    EXPECT_EQ(vec2[0], 2);
-    EXPECT_EQ(vec2[1], 3);
-
-    EXPECT_EQ(vec3[0], 0);
-    EXPECT_EQ(vec3[1], 0);
-    EXPECT_EQ(vec3[2], 0);
 }
 
 TEST(Callback, Params)
@@ -87,18 +77,18 @@ TEST(Callback, Params)
 
 }
 
-TEST(Callback, ParamsTransform)
-{
-    Vector2f test_v2;
-
-    Vector2f v2(2,3);
-    Vector3f v3(2,3,4);
-    RCallback cb3 = C([&](Vector2f v){
-        EXPECT_EQ(test_v2, v);
-    });
-    test_v2 = v2;           cb3(v2);
-    test_v2 = Vector2f();   cb3(v3);
-}
+//TEST(Callback, ParamsTransform)
+//{
+//    Vector2f test_v2;
+//
+//    Vector2f v2(2,3);
+//    Vector3f v3(2,3,4);
+//    RCallback cb3 = C([&](Vector2f v){
+//        EXPECT_EQ(test_v2, v);
+//    });
+//    test_v2 = v2;           cb3(v2);
+//    test_v2 = Vector2f();   cb3(v3);
+//}
 
 TEST(Size, ObjectMinnumSize)
 {
@@ -149,8 +139,6 @@ int main(int argc, char* argv[]) {
 #define PrintSize(CLASS) printf(#CLASS " size %d\n", sizeof(CLASS))
     PrintSize(StringName);
 
-    PrintSize(Vector3f);
-
     RCallback cb = C([](int l){
         printf("output %d\n", l);
     });
@@ -171,14 +159,6 @@ int main(int argc, char* argv[]) {
     cb2(2883, obj);
     cb2("nihao");
     cb2(obj);
-
-    Vector2f v2(2,3);
-    Vector3f v3(2,3,4);
-    RCallback cb3 = C([](Vector2f v){
-        printf("v(%f,%f)\n",v.x(), v.y());
-    });
-    cb3(v2);
-    cb3(v3);
 
 
     testing::InitGoogleTest(&argc, argv);
