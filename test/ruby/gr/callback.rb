@@ -1,6 +1,6 @@
 require 'object'
-class Callback < GCore::Object
-  native "gcore::Callback"
+class Callback < gc::Object
+  native "gc::Callback"
   
   def initialize &block
     super

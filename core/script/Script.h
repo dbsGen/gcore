@@ -11,7 +11,7 @@
 #include "../Action.h"
 #include "../StringName.h"
 
-namespace gcore {
+namespace gc {
     class Class;
     class Script;
     class ScriptClass;
@@ -20,7 +20,7 @@ namespace gcore {
     class Variant;
 
     /**
-     * Script 用于对应不同的script，----- (将要删除)每个script同时只存在一个Script对象
+     * Script 用于对应不同的script，每个script同时只存在一个Script对象
      * Script对象会管理ScriptClass
      * ScriptClass对象可以使用find和get来管理。
      */

@@ -9,7 +9,7 @@
 #include "../runtime.h"
 #include "../Ref.h"
 
-using namespace gcore;
+using namespace gc;
 
 pointer_map Script::scripts;
 

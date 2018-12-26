@@ -14,7 +14,7 @@
 #include "Object.h"
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
     
 #define NUMBER_BASE(T, CT) BASE_FINAL_CLASS_DEFINE \
     CT(){} \

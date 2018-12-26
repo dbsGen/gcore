@@ -22,7 +22,7 @@
 #define JOBJECT_CLASS   "java/lang/Object"
 
 using namespace std;
-using namespace gcore;
+using namespace gc;
 
 namespace gscript {
     class JScript;

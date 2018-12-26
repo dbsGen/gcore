@@ -11,7 +11,7 @@
 #include "Ref.h"
 #include "Object.h"
 
-namespace gcore {
+namespace gc {
     template <class T>
     CLASS_BEGIN_NV(Singleton, Object)
     private:

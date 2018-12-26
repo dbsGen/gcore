@@ -8,7 +8,7 @@
 #include <core/Variant.h>
 #include <core/Reference.h>
 
-using namespace gcore;
+using namespace gc;
 
 namespace gscript {
 

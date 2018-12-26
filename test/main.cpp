@@ -6,15 +6,13 @@
 #include <core/Callback.h>
 #include <core/math/Type.h>
 #include <script/ruby/RubyScript.h>
-#include <script/javascript/JSScript.h>
 
 #include <gtest/gtest.h>
 
-using namespace gcore;
+using namespace gc;
 using namespace gscript;
 
-#define RUBY_PATH "/Users/gen2/Programs/grender/gcore/test/ruby"
-#define JS_PATH "/Users/gen2/Programs/grender/gcore/test/javascript/run"
+#define PATH "/Users/gen2/Programs/grender/gc/test/ruby"
 
 #define STR(S) #S
 
@@ -127,9 +125,9 @@ TEST(Ruby, RunEnvFile)
     Ref<TestObject> obj;
 
     RubyScript ruby;
-    ruby.setup(RUBY_PATH);
+    ruby.setup(PATH);
 
-    ruby.run(RUBY_PATH "/test.rb");
+    ruby.run(PATH "/test.rb");
 
     obj = ruby.runScript("$to");
 
@@ -139,9 +137,6 @@ TEST(Ruby, RunEnvFile)
         EXPECT_STREQ(str.c_str(), "InRuby");
     }));
     ruby.runScript("$to.call_cb");
-
-    Reference objctA = ruby.runScript("$objct_a");
-    EXPECT_EQ((int)objctA->applyArgs("get_number"), 2018);
 }
 
 int main(int argc, char* argv[]) {
@@ -153,6 +148,7 @@ int main(int argc, char* argv[]) {
 
 #define PrintSize(CLASS) printf(#CLASS " size %d\n", sizeof(CLASS))
     PrintSize(StringName);
+
     PrintSize(Vector3f);
 
     RCallback cb = C([](int l){
@@ -184,14 +180,6 @@ int main(int argc, char* argv[]) {
     cb3(v2);
     cb3(v3);
 
-    JSScript::setup(JS_PATH);
-
-    JSScript *js = new JSScript();
-    js->runScript("1+2");
-
-    delete js;
-
-    JSScript::shutdown();
 
     testing::InitGoogleTest(&argc, argv);
 

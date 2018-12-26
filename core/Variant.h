@@ -13,7 +13,7 @@
 
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
 
     template<class T>
     class Ref;
@@ -32,9 +32,9 @@ namespace gcore {
             TypeLongLong,
             TypeFloat,
             TypeDouble,
-            TypeMemory,
             TypeStringName,
             TypePointer,
+            TypeMemory,
             TypeObject,
             TypeReference,
         ENUM_END

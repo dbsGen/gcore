@@ -29,7 +29,7 @@
 #include <string.h>
 
 using namespace std;
-using namespace gcore;
+using namespace gc;
 
 const void *Data::getBuffer() {
     long size = getSize();
@@ -601,7 +601,7 @@ Reference& Reference::operator=(Object *p) {
 //    }
 //}
 
-namespace gcore {
+namespace gc {
     const StringName MethodInitialer("initialize");
 }
 
@@ -930,7 +930,7 @@ int getName(const char *str, uint32_t h, const char **res = NULL) {
 //    return make_key(h, getIndex(chs, h));
 //}
 
-void *gcore::h(const char *chs) {
+void *gc::h(const char *chs) {
     uint32_t h = bkdrHash(chs);
     const char *ret;
     getName(chs, h, &ret);

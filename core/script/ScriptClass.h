@@ -11,7 +11,7 @@
 
 #include "../core_define.h"
 
-namespace gcore {
+namespace gc {
     class Object;
     class Script;
 

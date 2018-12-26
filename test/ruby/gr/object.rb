@@ -1,4 +1,4 @@
-module GCore
+module gc
   class Object
 
     def native_initialize

@@ -15,20 +15,21 @@
  *   对应不用script的保存方法。防止在c++持有的时候对象被释放掉。
  */
 
-namespace gcore {
+namespace gc {
     CLASS_BEGIN_N(NativeObject, RefObject)
 
         void *native;
     public:
-
         _FORCE_INLINE_ virtual void setNative(void *native) {
             this->native = native;
         }
         _FORCE_INLINE_ virtual void *getNative() {
             return native;
         }
-
         _FORCE_INLINE_ NativeObject() : native(NULL) {}
+        INITIALIZE(NativeObject, void *native,
+            this->native = native;
+        )
 
     CLASS_END
 }

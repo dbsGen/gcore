@@ -25,7 +25,7 @@
 #define OBJECT_CLASS    Object
 #define OBJECT_NAME     "Object"
 
-namespace gcore {
+namespace gc {
     class Script;
     class ScriptClass;
     class ScriptInstance;
@@ -49,8 +49,8 @@ namespace gcore {
         virtual void initialize() {}
         static const Class *getClass() {
             if (!_class_contrainer<Object>::_class) {
-                const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gcore", OBJECT_NAME));
-                _class_contrainer<Object>::_class = clazz ? clazz : ClassDB::getInstance()->cl<OBJECT_CLASS>("gcore", OBJECT_NAME, NULL);
+                const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gc", OBJECT_NAME));
+                _class_contrainer<Object>::_class = clazz ? clazz : ClassDB::getInstance()->cl<OBJECT_CLASS>("gc", OBJECT_NAME, NULL);
             }
             return _class_contrainer<Object>::_class;
         }
@@ -71,29 +71,13 @@ namespace gcore {
         void removeScript(ScriptInstance *instance);
         void clearScripts();
 #ifdef USING_SCRIPT
-        virtual void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0);
+        void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0);
 #else
-        _FORCE_INLINE_ virtual void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0) {}
+        _FORCE_INLINE_ void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0) {}
 #endif
         Variant apply(const StringName &name, const pointer_vector &params) {
             Variant ret;
             apply(name, &ret, (const Variant **)params.data(), (int)params.size());
-            return ret;
-        }
-        template<typename ...ARGS>
-        Variant applyArgs(const StringName &name, ARGS &&...args) {
-            const int size = sizeof...(ARGS);
-            Variant ret;
-            if (size) {
-                variant_vector vs{{args...}};
-                pointer_vector pv;
-                for (int i = 0; i < size; ++i) {
-                    pv.push_back(&vs[i]);
-                }
-                apply(name, &ret, (const Variant **)pv.data(), (int)pv.size());
-            }else {
-                apply(name, &ret);
-            }
             return ret;
         }
         void call(const StringName &name, Variant *result, const Variant **params = NULL, int count = 0);

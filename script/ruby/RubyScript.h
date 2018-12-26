@@ -25,39 +25,38 @@ namespace gscript {
     class RubyClass;
     class RubyInstance;
     
-    class RubyScript : public gcore::Script {
+    class RubyScript : public gc::Script {
         std::string context_root;
         mrb_state *mrb;
         
         void _setup(const char *root) const;
         
     protected:
-        virtual gcore::ScriptClass *makeClass() const;
+        virtual gc::ScriptClass *makeClass() const;
     public:
         RubyScript();
         ~RubyScript();
 
-        gcore::ScriptInstance  *newBuff(const std::string &cls_name, gcore::Object *target, const gcore::Variant **params, int count) const;
-        RubyInstance    *newBuff(struct RClass *cls, gcore::Object *target, const gcore::Variant **params, int count) const;
-        RubyClass       *reg_class(struct RClass *cls, const gcore::StringName &name);
+        gc::ScriptInstance  *newBuff(const std::string &cls_name, gc::Object *target, const gc::Variant **params, int count) const;
+        RubyInstance    *newBuff(struct RClass *cls, gc::Object *target, const gc::Variant **params, int count) const;
+        RubyClass       *reg_class(struct RClass *cls, const gc::StringName &name);
         
         void reset();
         void setup(const char *root);
         void addEnvPath(const char *path);
-        gcore::Variant run(const char *filepath) const;
-        gcore::Variant runScript(const char *script) const;
-        gcore::Variant call(const gcore::StringName &name, const gcore::Variant **params, int count) const;
+        gc::Variant run(const char *filepath) const;
+        gc::Variant runScript(const char *script) const;
         _FORCE_INLINE_ mrb_state *getMRB() {
             return mrb;
         }
     };
     
-    CLASS_BEGIN_N(RubyClass, gcore::ScriptClass)
+    CLASS_BEGIN_N(RubyClass, gc::ScriptClass)
         struct RClass *script_class;
         friend class RubyScript;
         
     protected:
-        virtual gcore::ScriptInstance *makeInstance() const;
+        virtual gc::ScriptInstance *makeInstance() const;
     public:
         _FORCE_INLINE_ struct RClass *getScriptClass() const {
             return script_class;
@@ -65,10 +64,10 @@ namespace gscript {
     
     public:
         
-        virtual gcore::Variant apply(const gcore::StringName &name, const gcore::Variant **params, int count) const;
+        virtual gc::Variant apply(const gc::StringName &name, const gc::Variant **params, int count) const;
     CLASS_END
     
-    CLASS_BEGIN_N(RubyInstance, gcore::ScriptInstance)
+    CLASS_BEGIN_N(RubyInstance, gc::ScriptInstance)
         struct RObject *script_instance;
         struct RClass *script_class;
     
@@ -82,26 +81,15 @@ namespace gscript {
             script_instance = si;
         }
         
-        virtual gcore::Variant apply(const gcore::StringName &name, const gcore::Variant **params, int count);
+        virtual gc::Variant apply(const gc::StringName &name, const gc::Variant **params, int count);
     CLASS_END
     
-    CLASS_BEGIN_N(RubyNativeObject, gcore::NativeObject)
-
-        mrb_state *mrb;
-
-        _FORCE_INLINE_ struct RObject *getInstance() {
-            return static_cast<struct RObject *>(getNative());
-        }
-
-    public:
-        RubyNativeObject(){}
-        RubyNativeObject(mrb_state *mrb, struct RObject *native);
-
-        virtual void setNative(void *native);
-        ~RubyNativeObject();
-
-        virtual void apply(const gcore::StringName &name, gcore::Variant *result = NULL, const gcore::Variant **params = NULL, int count = 0);
-
+    CLASS_BEGIN_N(RubyNativeObject, gc::NativeObject)
+public:
+    _FORCE_INLINE_ RubyNativeObject() {}
+    RubyNativeObject(void *native);
+    virtual void setNative(void *native);
+    ~RubyNativeObject();
     CLASS_END
 }
 

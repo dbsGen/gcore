@@ -1,11 +1,11 @@
 require 'object'
 
-class Data < GCore::Object
-    native "gcore::Data"
+class Data < gc::Object
+    native "gc::Data"
     
 end
 
-class FileData < GCore::Object
-    native "gcore::FileData"
+class FileData < gc::Object
+    native "gc::FileData"
     
 end

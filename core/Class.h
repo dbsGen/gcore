@@ -16,7 +16,7 @@
 
 #include "Define.h"
 
-namespace gcore  {
+namespace gc  {
     class Object;
     class ClassDB;
     class Method;

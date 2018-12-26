@@ -11,7 +11,7 @@
 #include "JScript.h"
 #include "../script_define.h"
 
-using namespace gcore;
+using namespace gc;
 
 namespace gscript {
     class JInstance : public ScriptInstance {
