@@ -13,7 +13,7 @@
 
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
 
     template<class T>
     class Ref;
@@ -32,9 +32,9 @@ namespace gcore {
             TypeLongLong,
             TypeFloat,
             TypeDouble,
-            TypeMemory,
             TypeStringName,
             TypePointer,
+            TypeMemory,
             TypeObject,
             TypeReference,
         ENUM_END
@@ -120,7 +120,8 @@ namespace gcore {
             return get();
         }
 
-        const Class *getType() const;
+        const Class *getTypeClass() const;
+        Type getType() const;
 
         _FORCE_INLINE_ Reference ref() const {
             return isRef() ? Reference((Object*)value.v_pointer) : Reference();

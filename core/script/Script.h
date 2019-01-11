@@ -11,7 +11,7 @@
 #include "../Action.h"
 #include "../StringName.h"
 
-namespace gcore {
+namespace gc {
     class Class;
     class Script;
     class ScriptClass;

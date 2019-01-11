@@ -17,7 +17,7 @@
 #include "core_define.h"
 
 
-namespace gcore {
+namespace gc {
     
     CLASS_BEGIN_N(Callback, RefObject)
     

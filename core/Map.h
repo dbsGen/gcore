@@ -10,7 +10,7 @@
 #include "Array.h"
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
     CLASS_BEGIN_N(_Map, RefObject)
 
         std::map<std::string, Variant> _map;

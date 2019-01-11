@@ -13,7 +13,7 @@
 #include <list>
 #include "Define.h"
 
-namespace gcore {
+namespace gc {
     typedef void (*ActionCallback)(void *sender, void *send_data, void *data);
     
     struct ActionItem {

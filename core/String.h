@@ -10,7 +10,7 @@
 #include "Ref.h"
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
     CLASS_BEGIN_N(_String, RefObject)
     private:
         std::string content;

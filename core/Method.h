@@ -13,7 +13,7 @@
 #include "Define.h"
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
     class Class;
     class StringName;
 

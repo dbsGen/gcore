@@ -4,18 +4,21 @@
 #include <core/Array.h>
 #include <vector>
 #include <core/Callback.h>
-#include <core/math/Type.h>
+#include <script/ruby/RubyScript.h>
 
 #include <gtest/gtest.h>
 
-using namespace gcore;
+using namespace gc;
+using namespace gscript;
+
+#define PATH "/Users/gen2/Programs/grender/gc/test/ruby"
 
 #define STR(S) #S
 
 TEST(Class, ClassRelationships)
 {
     EXPECT_EQ(TestObject::getClass()->getParent(), RefObject::getClass());
-    EXPECT_TRUE(TestObject::getClass()->isTypeOf(RefObject::getClass()));
+    EXPECT_TRUE(TestObject::getClass()->isTypeOf(Object::getClass()));
     EXPECT_TRUE(TestObject::getClass()->isSubclassOf(RefObject::getClass()));
     EXPECT_FALSE(TestObject::getClass()->isSubclassOf(TestObject::getClass()));
 }
@@ -46,15 +49,6 @@ TEST(Variant, Transform)
     Variant f_variant(30.32);
     EXPECT_EQ((int)f_variant, 30);
 
-    Variant v2_variant(Vector2f(2,3));
-    Vector2f vec2 = v2_variant;
-    Vector3f vec3 = v2_variant;
-    EXPECT_EQ(vec2[0], 2);
-    EXPECT_EQ(vec2[1], 3);
-
-    EXPECT_EQ(vec3[0], 0);
-    EXPECT_EQ(vec3[1], 0);
-    EXPECT_EQ(vec3[2], 0);
 }
 
 TEST(Callback, Params)
@@ -83,18 +77,18 @@ TEST(Callback, Params)
 
 }
 
-TEST(Callback, ParamsTransform)
-{
-    Vector2f test_v2;
-
-    Vector2f v2(2,3);
-    Vector3f v3(2,3,4);
-    RCallback cb3 = C([&](Vector2f v){
-        EXPECT_EQ(test_v2, v);
-    });
-    test_v2 = v2;           cb3(v2);
-    test_v2 = Vector2f();   cb3(v3);
-}
+//TEST(Callback, ParamsTransform)
+//{
+//    Vector2f test_v2;
+//
+//    Vector2f v2(2,3);
+//    Vector3f v3(2,3,4);
+//    RCallback cb3 = C([&](Vector2f v){
+//        EXPECT_EQ(test_v2, v);
+//    });
+//    test_v2 = v2;           cb3(v2);
+//    test_v2 = Vector2f();   cb3(v3);
+//}
 
 TEST(Size, ObjectMinnumSize)
 {
@@ -102,6 +96,37 @@ TEST(Size, ObjectMinnumSize)
     EXPECT_EQ(sizeof(Reference), 8);
     EXPECT_EQ(sizeof(Ref<TestObject>), 8);
     EXPECT_EQ(sizeof(Variant), 24);
+}
+
+
+TEST(Ruby, RunSimpleScript)
+{
+    RubyScript ruby;
+    EXPECT_EQ((int)ruby.runScript("1+2"), 3);
+    RArray arr = ruby.runScript("[1,'hello', 3]");
+
+    EXPECT_EQ((int)arr[0], 1);
+    EXPECT_STREQ((const char *)arr[1], "hello");
+    EXPECT_EQ((int)arr[2], 3);
+}
+
+TEST(Ruby, RunEnvFile)
+{
+    Ref<TestObject> obj;
+
+    RubyScript ruby;
+    ruby.setup(PATH);
+
+    ruby.run(PATH "/test.rb");
+
+    obj = ruby.runScript("$to");
+
+    EXPECT_EQ(obj->getIntValue(), 333);
+
+    obj->setCallback(C([](const std::string &str){
+        EXPECT_STREQ(str.c_str(), "InRuby");
+    }));
+    ruby.runScript("$to.call_cb");
 }
 
 int main(int argc, char* argv[]) {
@@ -113,8 +138,6 @@ int main(int argc, char* argv[]) {
 
 #define PrintSize(CLASS) printf(#CLASS " size %d\n", sizeof(CLASS))
     PrintSize(StringName);
-
-    PrintSize(Vector3f);
 
     RCallback cb = C([](int l){
         printf("output %d\n", l);
@@ -136,14 +159,6 @@ int main(int argc, char* argv[]) {
     cb2(2883, obj);
     cb2("nihao");
     cb2(obj);
-
-    Vector2f v2(2,3);
-    Vector3f v3(2,3,4);
-    RCallback cb3 = C([](Vector2f v){
-        printf("v(%f,%f)\n",v.x(), v.y());
-    });
-    cb3(v2);
-    cb3(v3);
 
 
     testing::InitGoogleTest(&argc, argv);

@@ -25,7 +25,7 @@
 #define OBJECT_CLASS    Object
 #define OBJECT_NAME     "Object"
 
-namespace gcore {
+namespace gc {
     class Script;
     class ScriptClass;
     class ScriptInstance;
@@ -49,8 +49,8 @@ namespace gcore {
         virtual void initialize() {}
         static const Class *getClass() {
             if (!_class_contrainer<Object>::_class) {
-                const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gcore", OBJECT_NAME));
-                _class_contrainer<Object>::_class = clazz ? clazz : ClassDB::getInstance()->cl<OBJECT_CLASS>("gcore", OBJECT_NAME, NULL);
+                const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gc", OBJECT_NAME));
+                _class_contrainer<Object>::_class = clazz ? clazz : ClassDB::getInstance()->cl<OBJECT_CLASS>("gc", OBJECT_NAME, NULL);
             }
             return _class_contrainer<Object>::_class;
         }

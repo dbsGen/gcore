@@ -2,8 +2,8 @@
 // Created by gen on 16/5/30.
 //
 
-#ifndef GCORE_DEFINE_H
-#define GCORE_DEFINE_H
+#ifndef gc_DEFINE_H
+#define gc_DEFINE_H
 
 #ifndef NULL
 #   define NULL 0
@@ -52,7 +52,7 @@
 #define __CLASS_BEGIN_NS_EX(NAME, SUPER, METHOD, T) \
 class NAME : public SUPER T { \
     public: \
-        DEFINE_GET_CLASS_NS(__NAMESPACE__, NAME, SUPER, METHOD) \
+        DEFINE_GET_CLASS_NS(__NAMESPACE__, NAME, SUPER T, METHOD) \
     private:\
         friend class __CLASS_NS(ClassDB);
 
@@ -76,7 +76,7 @@ class NAME : public SUPER T { \
 #define CLASS_BEGIN_NV(NAME, SUPER) __CLASS_BEGIN_NS_EX(NAME, SUPER, vr, _TC0())
 #define CLASS_BEGIN_V(NAME, SUPER)  __CLASS_BEGIN_EX(NAME, SUPER, vr, _TC0())
 
-#define __CLASS_NS(CLASS) gcore::CLASS
+#define __CLASS_NS(CLASS) gc::CLASS
 
 /**
  * CLASS_BEGIN_T 用来定义一个类,
@@ -101,11 +101,11 @@ class NAME : public SUPER T { \
 
 #define BASE_FINAL_CLASS_DEFINE \
 protected:\
-    _FORCE_INLINE_ static void onClassLoaded(Class *clz) {}\
-    friend class ClassDB;\
+    _FORCE_INLINE_ static void onClassLoaded(gc::Class *clz) {}\
+    friend class gc::ClassDB;\
 public:\
-    static const Class *getClass();\
-    const Class *getInstanceClass() const;\
+    static const gc::Class *getClass();\
+    const gc::Class *getInstanceClass() const;\
 private:
 
 #define BASE_FINAL_CLASS_DEFINE_T(TYPE) \
@@ -130,8 +130,8 @@ private:
 
 #define BASE_CLASS_IMPLEMENT(CLZ) const Class *CLZ::getClass() {\
     if (!_class_contrainer<CLZ>::_class) {\
-        const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gcore", #CLZ));\
-        _class_contrainer<CLZ>::_class = clazz ? clazz : ClassDB::getInstance()->cl<CLZ>("gcore", #CLZ, NULL);\
+        const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gc", #CLZ));\
+        _class_contrainer<CLZ>::_class = clazz ? clazz : ClassDB::getInstance()->cl<CLZ>("gc", #CLZ, NULL);\
     }\
     return _class_contrainer<CLZ>::_class;\
 }\
@@ -141,8 +141,8 @@ const Class *CLZ::getInstanceClass() const {\
 
 #define BASE_CLASS_IMPLEMENT_V(CLZ) const Class *CLZ::getClass() {\
     if (!_class_contrainer<CLZ>::_class) {\
-        const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gcore", #CLZ));\
-        _class_contrainer<CLZ>::_class = clazz ? clazz : ClassDB::getInstance()->vr<CLZ>("gcore", #CLZ, NULL);\
+        const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gc", #CLZ));\
+        _class_contrainer<CLZ>::_class = clazz ? clazz : ClassDB::getInstance()->vr<CLZ>("gc", #CLZ, NULL);\
     }\
     return _class_contrainer<CLZ>::_class;\
 }\
@@ -166,15 +166,15 @@ enum {
 #ifdef USING_SCRIPT
 
 #define SET_LABELS(...) cls->setLabels(variant_map{__VA_ARGS__});
-#define ON_LOADED_BEGIN(CLZ, SUPER) _FORCE_INLINE_ static void onClassLoaded(gcore::Class *CLZ) { \
+#define ON_LOADED_BEGIN(CLZ, SUPER) _FORCE_INLINE_ static void onClassLoaded(gc::Class *CLZ) { \
     SUPER::onClassLoaded(CLZ);
 #define ON_LOADED_END }
 
 #define INITIALIZER(CLASS, TYPE, M) ADD_METHOD(CLASS, TYPE, M)
-#define ADD_METHOD(CLASS, TYPE, M) CLASS->addMethod(gcore::MethodImp_makeMethod<TYPE>(#M, &TYPE::M))
+#define ADD_METHOD(CLASS, TYPE, M) CLASS->addMethod(gc::MethodImp_makeMethod<TYPE>(#M, &TYPE::M))
 #define ADD_METHOD_E(CLASS, TYPE, M_TYPE, M) CLASS->addMethod(MethodImp_makeMethod<TYPE>(#M, (M_TYPE)&TYPE::M))
 
-#define ADD_PROPERTY(CLASS, ...) CLASS->addProperty(new gcore::Property(CLASS, __VA_ARGS__))
+#define ADD_PROPERTY(CLASS, ...) CLASS->addProperty(new gc::Property(CLASS, __VA_ARGS__))
 #define ADD_PROPERTY_EX(CLASS, NAME, TYPE, GETTER, SETTER) ADD_PROPERTY(CLASS, NAME, ADD_MEMBER_METHOD(CLASS, TYPE, GETTER), ADD_MEMBER_METHOD(CLASS, TYPE, SETTER))
 
 #else
@@ -219,11 +219,11 @@ _FORCE_INLINE_ virtual const __CLASS_NS(Class) *getInstanceClass() const { \
     return NAME::getClass(); \
 }
 
-#define SUPPORT_VARIANT(TYPE) _FORCE_INLINE_ operator Variant() const { \
-    return Variant::memoryVar(this); \
+#define SUPPORT_VARIANT(TYPE) _FORCE_INLINE_ operator gc::Variant() const { \
+    return gc::Variant::memoryVar(this); \
 } \
-_FORCE_INLINE_ TYPE(const Variant &var) : TYPE() { \
-    if (var.getType()->isTypeOf(TYPE::getClass())) var.getMemory(*this); \
+_FORCE_INLINE_ TYPE(const gc::Variant &var) : TYPE() { \
+    if (var.getTypeClass()->isTypeOf(TYPE::getClass())) var.getMemory(*this); \
 }
 
 
@@ -276,19 +276,19 @@ _FORCE_INLINE_ CLASS(PARAMS):CLASS(){PROGRAMS}
 // ----------- Types
 
 #define pointer_map     std::map<void*, void*>
-#define variant_map     std::map<void*, gcore::Variant>
-#define ref_map         std::map<void*, gcore::Reference>
+#define variant_map     std::map<void*, gc::Variant>
+#define ref_map         std::map<void*, gc::Reference>
 #define pointer_vector  std::vector<void*>
-#define variant_vector  std::vector<Variant>
+#define variant_vector  std::vector<gc::Variant>
 #define float_vector    std::vector<float>
-#define ref_vector      std::vector<Reference>
+#define ref_vector      std::vector<gc::Reference>
 #define b8_vector       std::vector<u_int8_t>
 #define pointer_list    std::list<void*>
-#define ref_list        std::list<Reference>
-#define variant_list    std::list<Variant>
+#define ref_list        std::list<gc::Reference>
+#define variant_list    std::list<gc::Variant>
 
 #define b8_mask     0xff
 #define b16_mask    0xffff
 #define b32_mask    0xffffffff
 
-#endif //GCORE_DEFINE_H
+#endif //gc_DEFINE_H

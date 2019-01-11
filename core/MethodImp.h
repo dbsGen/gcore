@@ -9,7 +9,7 @@
 #include "Class.h"
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
 
     class Object;
     
@@ -52,19 +52,19 @@ namespace gcore {
     };
     template <class C> struct base_type<short, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::Short");
+            static const StringName name("gc::Short");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<unsigned short, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::Short");
+            static const StringName name("gc::Short");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<int, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::Integer");
+            static const StringName name("gc::Integer");
             return ClassDB::getInstance()->find(name);
         }
     };
@@ -75,43 +75,43 @@ namespace gcore {
     };
     template <class C> struct base_type<const std::string &, C> {
         static const Class *getClass() {
-            static const StringName name("gcore::String");
+            static const StringName name("gc::String");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<std::string, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::String");
+            static const StringName name("gc::String");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<const char *, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::String");
+            static const StringName name("gc::String");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<float, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::Float");
+            static const StringName name("gc::Float");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<double, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::Double");
+            static const StringName name("gc::Double");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<long, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::Long");
+            static const StringName name("gc::Long");
             return ClassDB::getInstance()->find(name);
         }
     };
     template <class C> struct base_type<bool, C> {
         _FORCE_INLINE_ static const Class *getClass() {
-            static const StringName name("gcore::Boolean");
+            static const StringName name("gc::Boolean");
             return ClassDB::getInstance()->find(name);
         }
     };

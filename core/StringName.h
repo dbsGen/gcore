@@ -10,8 +10,9 @@
 #include "Hash.h"
 #include "core_define.h"
 
-namespace gcore {
+namespace gc {
     class Class;
+    class ClassDB;
     
     class StringName {
     BASE_FINAL_CLASS_DEFINE

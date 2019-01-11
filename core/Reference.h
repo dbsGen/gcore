@@ -7,9 +7,10 @@
 
 #include "Define.h"
 
-namespace gcore {
+namespace gc {
     class Object;
     class Class;
+    class ClassDB;
     class Variant;
     class StringName;
 

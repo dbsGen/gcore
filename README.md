@@ -1,4 +1,4 @@
-# gcore
+# gc
 This is a c++ reflection framework. set and get attribute dynamic, callback
 variable parameter, classes relationships, methods or properties from a class.
 
@@ -10,7 +10,7 @@ Write C++ Class like:
         #include <core/Ref.h>
 
         // Define a class
-        CLASS_BEGIN(TestObject, gcore::RefObject)
+        CLASS_BEGIN(TestObject, gc::RefObject)
 
         private:
             int int_value;
@@ -37,7 +37,7 @@ Run the `process.rb`
 
 This action would generate the dynamic codes. like:
 
-        ON_LOADED_BEGIN(cls, gcore::RefObject)
+        ON_LOADED_BEGIN(cls, gc::RefObject)
             ADD_PROPERTY(cls, "int_value", ADD_METHOD(cls, TestObject, getIntValue), ADD_METHOD(cls, TestObject, setIntValue));
         ON_LOADED_END
 

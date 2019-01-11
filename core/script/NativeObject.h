@@ -15,7 +15,7 @@
  *   对应不用script的保存方法。防止在c++持有的时候对象被释放掉。
  */
 
-namespace gcore {
+namespace gc {
     CLASS_BEGIN_N(NativeObject, RefObject)
 
         void *native;
