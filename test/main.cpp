@@ -11,15 +11,15 @@
 using namespace gc;
 using namespace gscript;
 
-#define PATH "/Users/gen2/Programs/grender/gc/test/ruby"
+#define PATH "/Users/gen2/Programs/gcore/test/ruby"
 
 #define STR(S) #S
 
 TEST(Class, ClassRelationships)
 {
-    EXPECT_EQ(TestObject::getClass()->getParent(), RefObject::getClass());
+    EXPECT_EQ(TestObject::getClass()->getParent(), Object::getClass());
     EXPECT_TRUE(TestObject::getClass()->isTypeOf(Object::getClass()));
-    EXPECT_TRUE(TestObject::getClass()->isSubclassOf(RefObject::getClass()));
+    EXPECT_TRUE(TestObject::getClass()->isSubclassOf(Object::getClass()));
     EXPECT_FALSE(TestObject::getClass()->isSubclassOf(TestObject::getClass()));
 }
 
@@ -112,21 +112,30 @@ TEST(Ruby, RunSimpleScript)
 
 TEST(Ruby, RunEnvFile)
 {
-    Ref<TestObject> obj;
+    Ref<TestObject> obj1;
 
     RubyScript ruby;
     ruby.setup(PATH);
 
     ruby.run(PATH "/test.rb");
 
-    obj = ruby.runScript("$to");
+    obj1 = ruby.runScript("$obj1");
 
-    EXPECT_EQ(obj->getIntValue(), 333);
+    EXPECT_EQ(obj1->getIntValue(), 333);
 
-    obj->setCallback(C([](const std::string &str){
+    obj1->setCallback(C([](const std::string &str){
         EXPECT_STREQ(str.c_str(), "InRuby");
     }));
-    ruby.runScript("$to.call_cb");
+    ruby.runScript("$obj1.call_cb");
+
+    Variant obj2 = ruby.runScript("$obj2");
+    obj2->call("print", NULL);
+
+    Variant var(obj1);
+    Variant* vs[] {&var};
+    ruby.apply("test", (const Variant **)vs, 1);
+    vs[0] = &obj2;
+    ruby.apply("test", (const Variant **)vs, 1);
 }
 
 int main(int argc, char* argv[]) {

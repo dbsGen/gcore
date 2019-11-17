@@ -11,7 +11,7 @@
 #include "core_define.h"
 
 namespace gc {
-    CLASS_BEGIN_NV(Data, RefObject)
+    CLASS_BEGIN_NV(Data, Object)
 
         void *buffer;
 
@@ -29,7 +29,7 @@ namespace gc {
         METHOD static Ref<Data> fromString(const std::string &str);
 
     protected:
-        ON_LOADED_BEGIN(cls, RefObject)
+        ON_LOADED_BEGIN(cls, Object)
             ADD_METHOD(cls, Data, getSize);
             ADD_METHOD(cls, Data, empty);
             ADD_METHOD(cls, Data, close);

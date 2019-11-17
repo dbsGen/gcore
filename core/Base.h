@@ -22,8 +22,8 @@
 #define CLASS_BEGIN_0_NV(NAME)  CLASS_BEGIN_NV(NAME, __CLASS_NS(OBJECT_CLASS))
 #define CLASS_BEGIN_0_V(NAME)   CLASS_BEGIN_V(NAME, __CLASS_NS(OBJECT_CLASS))
 
-#define OBJECT_CLASS    Object
-#define OBJECT_NAME     "Object"
+#define OBJECT_CLASS    Base
+#define OBJECT_NAME     "Base"
 
 namespace gc {
     class Script;
@@ -33,11 +33,7 @@ namespace gc {
 
     class OBJECT_CLASS {
     private:
-        struct Scripts;
-        Scripts *scripts_container;
-        ActionManager  *on_destroy;
         friend class Variant;
-        friend class Script;
 
     protected:
         _FORCE_INLINE_ static void onClassLoaded(Class *clz) {}
@@ -46,7 +42,9 @@ namespace gc {
         friend class ClassDB;
 
     public:
-        virtual void initialize() {}
+        static const StringName KEY_INITIALIZE;
+
+        METHOD void initialize() {}
         static const Class *getClass() {
             if (!_class_contrainer<Object>::_class) {
                 const Class *clazz = ClassDB::getInstance()->find_loaded(ClassDB::connect("gc", OBJECT_NAME));
@@ -56,7 +54,7 @@ namespace gc {
         }
 
         _FORCE_INLINE_ virtual const Class *getInstanceClass() const {
-            return Object::getClass();
+            return Base::getClass();
         }
 
         _FORCE_INLINE_ bool instanceOf(const Class *clz) const {
@@ -67,20 +65,9 @@ namespace gc {
             }
             return false;
         }
-        void addScript(ScriptInstance *scriptClass);
-        void removeScript(ScriptInstance *instance);
-        void clearScripts();
-#ifdef USING_SCRIPT
-        void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0);
-#else
-        _FORCE_INLINE_ void apply(const StringName &name, Variant *result = NULL, const Variant **params = NULL, int count = 0) {}
-#endif
-        Variant apply(const StringName &name, const pointer_vector &params) {
-            Variant ret;
-            apply(name, &ret, (const Variant **)params.data(), (int)params.size());
-            return ret;
-        }
         void call(const StringName &name, Variant *result, const Variant **params = NULL, int count = 0);
+
+        virtual void missMethod(const StringName &name, Variant *result, const Variant **params, int count) {}
         
         Variant call(const StringName &name, const pointer_vector &params = pointer_vector()) {
             Variant ret;
@@ -117,15 +104,11 @@ namespace gc {
             const Class *cls = getInstanceClass();
             return "[" + std::string(cls->getFullname().str()) + "]";
         }
-        void pushOnDestroy(ActionCallback callback, void *data);
-        void removeOnDestroy(ActionCallback callback, void *data);
         Variant var();
 
         bool copy(const Object *other);
 
 //        bool test_object;
-        _FORCE_INLINE_ Object():scripts_container(NULL), on_destroy(NULL) {}
-        virtual ~Object();
     };
 }
 

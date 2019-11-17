@@ -16,10 +16,12 @@
  */
 
 namespace gc {
-    CLASS_BEGIN_N(NativeObject, RefObject)
+    CLASS_BEGIN_N(NativeObject, Object)
 
         void *native;
+
     public:
+
         _FORCE_INLINE_ virtual void setNative(void *native) {
             this->native = native;
         }
@@ -27,9 +29,7 @@ namespace gc {
             return native;
         }
         _FORCE_INLINE_ NativeObject() : native(NULL) {}
-        INITIALIZE(NativeObject, void *native,
-            this->native = native;
-        )
+        NativeObject(void *native) : native(native) {}
 
     CLASS_END
 }

@@ -11,61 +11,40 @@
 
 #include <stdlib.h>
 #include <list>
-#include "Define.h"
+#include <map>
+#include "Reference.h"
+#include "StringName.h"
+#include "Variant.h"
 
 namespace gc {
-    typedef void (*ActionCallback)(void *sender, void *send_data, void *data);
-    
-    struct ActionItem {
-        ActionCallback callback;
-        void *data;
-        
-        _FORCE_INLINE_ ActionItem() : callback(NULL), data(NULL) {}
-        _FORCE_INLINE_ ActionItem(ActionCallback callback, void *data) {
-            this->callback = callback;
-            this->data = data;
-        }
-        
-        _FORCE_INLINE_ void operator()(void *sender, void *send_data = NULL) const {
-            if (callback) {
-                callback(sender, send_data, data);
-            }
-        }
-    };
-    
-    class ActionManager {
-        
+    class RCallback;
+
+    typedef std::list<RCallback> CallbackStack;
+
+    class EventManager {
+        std::map<StringName, CallbackStack> events;
+
     public:
-        std::list<ActionItem> items;
-        
-        _FORCE_INLINE_ ActionManager() {}
-        _FORCE_INLINE_ ~ActionManager() {
-        }
-        _FORCE_INLINE_ void push(ActionCallback callback, void *data) {
-            items.push_back(ActionItem(callback, data));
-        }
-        void remove(ActionCallback callback, void *data) {
-            auto it = items.begin(), _e = items.end();
-            while (it != _e) {
-                const ActionItem &item = *it;
-                if (item.callback == callback && item.data == data) {
-                    it = items.erase(it);
-                }else {
-                    ++it;
-                }
+        struct EventHandler {
+            StringName name;
+            EventManager &manager;
+
+            void operator<<(const RCallback &);
+            void operator>>(const RCallback &);
+
+            void call(const variant_vector &variants) const;
+
+            template <typename ...Args>
+            void operator() (Args && ...args) const {
+                call(variant_vector{{args...}});
             }
+
+        };
+
+        _FORCE_INLINE_ EventHandler operator[] (const StringName &name) {
+            return EventHandler{name, *this};
         }
-        _FORCE_INLINE_ void clear() {
-            items.clear();
-        }
-        _FORCE_INLINE_ size_t size() {
-            return items.size();
-        }
-        _FORCE_INLINE_ void operator() (void *sender, void *send_data = NULL) {
-            auto items = this->items;
-            for (auto it = items.begin(), _e = items.end(); it != _e; ++it)
-                (*it)(sender, send_data);
-        }
+
     };
 }
 

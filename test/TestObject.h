@@ -6,11 +6,11 @@
 #define GRENDER_TEST_TESTOBJECT_H
 
 
-#include <core/Object.h>
+#include <core/Base.h>
 #include <core/Ref.h>
 #include <core/Callback.h>
 
-CLASS_BEGIN(TestObject, gc::RefObject)
+CLASS_BEGIN(TestObject, gc::Object)
 
 private:
     int int_value;
@@ -38,7 +38,7 @@ public:
     PROPERTY(callback, getCallback, setCallback);
 
 protected:
-    ON_LOADED_BEGIN(cls, gc::RefObject)
+    ON_LOADED_BEGIN(cls, gc::Object)
         ADD_PROPERTY(cls, "int_value", ADD_METHOD(cls, TestObject, getIntValue), ADD_METHOD(cls, TestObject, setIntValue));
         ADD_PROPERTY(cls, "callback", ADD_METHOD(cls, TestObject, getCallback), ADD_METHOD(cls, TestObject, setCallback));
     ON_LOADED_END

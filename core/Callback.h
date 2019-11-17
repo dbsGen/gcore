@@ -9,7 +9,7 @@
 #ifndef Callback_h
 #define Callback_h
 
-#include "Object.h"
+#include "Base.h"
 #include "Reference.h"
 #include "Variant.h"
 #include "Array.h"
@@ -19,7 +19,7 @@
 
 namespace gc {
     
-    CLASS_BEGIN_N(Callback, RefObject)
+    CLASS_BEGIN_N(Callback, Object)
     
     public:
         Callback() {}
@@ -32,7 +32,7 @@ namespace gc {
         EVENT(Variant, _invoke, const RArray &params);
     
     protected:
-        ON_LOADED_BEGIN(cls, RefObject)
+        ON_LOADED_BEGIN(cls, Object)
             ADD_METHOD(cls, Callback, invoke);
         ON_LOADED_END
     CLASS_END

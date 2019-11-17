@@ -26,14 +26,14 @@ namespace gc {
         void retain();
 
         friend class ClassDB;
+        friend class Weak;
 
     public:
         Reference(const Reference &other) : ptr(other.ptr) {
             retain();
         }
         _FORCE_INLINE_ Reference() : ptr(NULL) {}
-        template <typename T>
-        _FORCE_INLINE_ Reference(T *p) : ptr(p) {retain();}
+        _FORCE_INLINE_ Reference(Object *p) : ptr(p) {retain();}
 
         _FORCE_INLINE_ ~Reference() {
             release();
@@ -80,10 +80,33 @@ namespace gc {
             return ptr != NULL;
         }
         void call(const StringName &name, Variant *result, const Variant **params, int count);
-        
+
         Reference(const Variant &other);
 
         std::string str() const;
+    };
+
+    class Weak {
+    BASE_FINAL_CLASS_DEFINE
+    private:
+        static Weak nullWeak;
+
+        Object *ptr;
+
+    public:
+        Weak(const Weak &other) : ptr(other.ptr) {}
+        Weak() : ptr(NULL) {}
+        Weak(Object *p) : ptr(p) {}
+
+        Weak(const Reference & other) : ptr(other.ptr) {}
+
+        operator bool() {
+            return !!ptr;
+        }
+
+        Object * get() const {
+            return ptr;
+        }
     };
 }
 

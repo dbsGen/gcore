@@ -5,13 +5,13 @@
 #ifndef HI_RENDER_PROJECT_ANDROID_STRING_H
 #define HI_RENDER_PROJECT_ANDROID_STRING_H
 
-#include "Object.h"
+#include "Base.h"
 #include <string>
 #include "Ref.h"
 #include "core_define.h"
 
 namespace gc {
-    CLASS_BEGIN_N(_String, RefObject)
+    CLASS_BEGIN_N(_String, Object)
     private:
         std::string content;
 

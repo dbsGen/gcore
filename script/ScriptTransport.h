@@ -9,7 +9,7 @@
 #ifndef ScriptTransport_hpp
 #define ScriptTransport_hpp
 
-#include <core/Object.h>
+#include <core/Base.h>
 #include <core/Reference.h>
 #include <core/StringName.h>
 #include "script_define.h"

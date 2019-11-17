@@ -11,7 +11,7 @@
 
 namespace gc {
 
-    class Object;
+    class Base;
     
     
     template<int... Is>

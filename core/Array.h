@@ -10,7 +10,7 @@
 #define Vector_h
 
 #include "Class.h"
-#include "Object.h"
+#include "Base.h"
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -22,7 +22,7 @@ namespace gc {
     class RArray;
     class RCallback;
 
-    CLASS_BEGIN_N(_Array, RefObject)
+    CLASS_BEGIN_N(_Array, Object)
     
     public:
         typedef variant_vector::const_iterator Iterator;
@@ -116,7 +116,7 @@ namespace gc {
         METHOD void setListener(const RCallback &callback);
 
     protected:
-        ON_LOADED_BEGIN(cls, RefObject)
+        ON_LOADED_BEGIN(cls, Object)
             ADD_METHOD(cls, _Array, size);
             ADD_METHOD(cls, _Array, push_back);
             ADD_METHOD(cls, _Array, get);

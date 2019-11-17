@@ -9,7 +9,7 @@
 #include <mutex>
 #include "core_define.h"
 #include "Ref.h"
-#include "Object.h"
+#include "Base.h"
 
 namespace gc {
     template <class T>

@@ -5,7 +5,7 @@
 #ifndef VOIPPROJECT_SCRIPTCLASS_H
 #define VOIPPROJECT_SCRIPTCLASS_H
 
-#include "../Object.h"
+#include "core/Base.h"
 #include "../StringName.h"
 #include "../Variant.h"
 
@@ -67,14 +67,6 @@ namespace gc {
          * 获得一个中间件，没有找到返回空(NULL)
          */
         ScriptInstance *get(Object *target) const;
-    
-        /**
-         * 创建一个中间件, 通过这个方法得到ScriptInstance
-         * 将不会拥有target内存管理的控制权。
-         * 在回调给script层的参数中有未被管理(不在HiRender体系中)的native对象时使用。
-         * 或者newBuff中使用.
-         */
-        ScriptInstance *create(void *target) const;
 
         /**
          * 创建一个中间件, 通过这个方法得到ScriptInstance
@@ -82,7 +74,7 @@ namespace gc {
          * 否则将会作为指针保存
          * 在回调给script层的参数中有native对象时使用。
          */
-        ScriptInstance *createVariant(Object *target) const;
+        ScriptInstance *create(Object *target) const;
     
         /**
          * 初始化一个新的ScriptInstance并且会创建对应的c++对象，

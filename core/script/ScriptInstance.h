@@ -5,14 +5,16 @@
 #ifndef HI_RENDER_PROJECT_ANDROID_SCRIPTINSTANCE_H
 #define HI_RENDER_PROJECT_ANDROID_SCRIPTINSTANCE_H
 
-#include "../Object.h"
+#include "core/Base.h"
 #include "../StringName.h"
 #include "../Variant.h"
 #include "../core_define.h"
+#include "../Reference.h"
 
 namespace gc {
     class Script;
     class ScriptClass;
+    class Object;
     
     /**
      * 链接native与script对象的中间件, 传递函数调用，见ScriptClass
@@ -21,15 +23,13 @@ namespace gc {
      */
     CLASS_BEGIN_0_V(ScriptInstance)
     private:
-        void *target;
-        bool target_ref;
+        Reference target;
         const Script *script;
         ScriptClass *cls;
         bool single_class;
 
-        _FORCE_INLINE_ void setTarget(void *object, bool tr) {
+        _FORCE_INLINE_ void setTarget(Object *object) {
             target = object;
-            target_ref = tr;
         }
         _FORCE_INLINE_ void setScript(const Script *script) {
             this->script = script;
@@ -50,7 +50,7 @@ namespace gc {
         virtual Variant apply(const StringName &name, const Variant **params, int count) = 0;
 
         _FORCE_INLINE_ Variant getTarget() const {
-            return target_ref ? Variant(*(Reference*)target) : Variant(target);
+            return target;
         }
         _FORCE_INLINE_ const Script *getScript() const {
             return script;

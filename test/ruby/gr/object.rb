@@ -1,4 +1,4 @@
-module gc
+module GC
   class Object
 
     def native_initialize

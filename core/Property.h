@@ -47,10 +47,10 @@ namespace gc {
             return *name;
         }
 
-        _FORCE_INLINE_ Variant get(Object *obj) const {
+        _FORCE_INLINE_ Variant get(Base *obj) const {
             return getter->call(obj, NULL, 0);
         }
-        _FORCE_INLINE_ void set(Object *obj, const Variant &v) const {
+        _FORCE_INLINE_ void set(Base *obj, const Variant &v) const {
             const Variant *vp[] = {&v};
             setter->call(obj, vp, 1);
         }

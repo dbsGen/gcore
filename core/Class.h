@@ -17,7 +17,7 @@
 #include "Define.h"
 
 namespace gc  {
-    class Object;
+    class Base;
     class ClassDB;
     class Method;
     class Property;

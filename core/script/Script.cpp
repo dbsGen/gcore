@@ -5,15 +5,16 @@
 #include "Script.h"
 #include "ScriptClass.h"
 #include "ScriptInstance.h"
-#include "../Object.h"
+#include "core/Base.h"
 #include "../runtime.h"
 #include "../Ref.h"
+#include "../Callback.h"
 
 using namespace gc;
 
 pointer_map Script::scripts;
 
-ScriptClass* Script::find(const StringName &fullname, bool &create) {
+ScriptClass* Script::findOrCreate(const StringName &fullname, bool &create) {
     auto it = classes.find(fullname);
     if (it == classes.end()) {
         const Class *cls = ClassDB::getInstance()->find(fullname);
@@ -64,6 +65,10 @@ Script::Script(const StringName &name) : name(name) {
     scripts[name] = this;
 }
 
+void Script::addFunction(const StringName &name, const gc::RCallback &function) {
+    functions[name] = function;
+}
+
 Variant ScriptClass::call(const StringName &name, const Variant **params, int count) const {
     const Method *mtd = cls->getMethod(name);
     if (mtd && mtd->getType() == Method::Static) return mtd->call(NULL, params, count);
@@ -71,15 +76,20 @@ Variant ScriptClass::call(const StringName &name, const Variant **params, int co
 }
 
 ScriptInstance* ScriptClass::newInstance(const Variant **params, int count) const {
-    Reference *ref = new Reference((Object*)cls->instance());
-    ScriptInstance *sin = makeInstance();
-    sin->setScript(script);
-    sin->setMiddleClass(const_cast<ScriptClass*>(this));
-    if (cls->isTypeOf(Object::getClass())) {
-        (*ref)->addScript(sin);
+    if (cls->isSubclassOf(Object::getClass())) {
+        Object *ref = (Object*)cls->instance();
+        ref->call(KEY_INITIALIZE, nullptr, params, count);
+        ScriptInstance *sin = makeInstance();
+        sin->setScript(script);
+        sin->setMiddleClass(const_cast<ScriptClass*>(this));
+        if (cls->isTypeOf(Base::getClass())) {
+            ref->addScript(sin);
+        }
+        sin->setTarget(ref);
+        return sin;
     }
-    sin->setTarget(ref, true);
-    return sin;
+    LOG(w, "Wrong Class Type %s", cls ? cls->getName(): "null");
+    return nullptr;
 }
 
 ScriptInstance *ScriptClass::newInstance() const {
@@ -93,26 +103,19 @@ ScriptInstance *ScriptClass::get(Object *target) const {
     return script->getScriptInstance(target);
 }
 
-ScriptInstance *ScriptClass::create(void *target) const {
-    ScriptInstance *ins = makeInstance();
-    ins->setScript(script);
-    ins->setMiddleClass(const_cast<ScriptClass*>(this));
-    ins->setTarget(target, false);
-    return ins;
-}
-
-ScriptInstance* ScriptClass::createVariant(Object *target) const {
-    ScriptInstance *ins = makeInstance();
-    ins->setScript(script);
-    ins->setMiddleClass(const_cast<ScriptClass*>(this));
-    if (target->getInstanceClass()->isTypeOf(RefObject::getClass())) {
-        ins->setTarget(new Reference(target), true);
+ScriptInstance* ScriptClass::create(Object *target) const {
+    const Class *cls = target->getInstanceClass();
+    if (cls->isTypeOf(Object::getClass())) {
+        ScriptInstance *ins = makeInstance();
+        ins->setScript(script);
+        ins->setMiddleClass(const_cast<ScriptClass*>(this));
+        ins->setTarget(target);
         target->addScript(ins);
+        return ins;
     }else {
-        ins->setTarget(target, false);
-        target->addScript(ins);
+        LOG(w, "%s is not Object", cls->getName());
+        return NULL;
     }
-    return ins;
 }
 
 Variant ScriptInstance::call(const StringName &name, const Variant **params, int count) const {
@@ -146,15 +149,10 @@ void ScriptInstance::set(const StringName &name, const Variant &val) const {
 
 ScriptInstance::~ScriptInstance() {
     if (target) {
-        if (target_ref) {
-            Reference *ref = (Reference*)target;
-            (*ref)->removeScript(this);
-            delete ref;
-        }else {
-            ((Object*)target)->removeScript(this);
-        }
+        ((Object*)target)->removeScript(this);
     }
     if (single_class && cls) {
         delete cls;
     }
 }
+

@@ -28,6 +28,7 @@ namespace gc {
         
         static pointer_map scripts;
         pointer_map classes;
+        ref_map functions;
         StringName name;
 
     protected:
@@ -37,6 +38,8 @@ namespace gc {
          * To make a special class
          */
         virtual ScriptClass *makeClass() const = 0;
+
+        virtual void defineFunction(const StringName &name, const RCallback &function) = 0;
 
     public:
         virtual ~Script();
@@ -51,7 +54,7 @@ namespace gc {
          * 这是需要做一些初始化操作,其中必须建立脚本类与中间
          * 类的联系
          */
-        ScriptClass *find(const StringName &fullname, bool &create);
+        ScriptClass *findOrCreate(const StringName &fullname, bool &create);
         Script(const StringName &name);
         
         _FORCE_INLINE_ static Script *get(const StringName &name) {
@@ -64,6 +67,8 @@ namespace gc {
          * 这时script instance不拥有target的内存控制权.
          */
         virtual ScriptInstance *newBuff(const std::string &cls_name, Object *target, const Variant **params, int count) const = 0;
+
+        void addFunction(const StringName &name, const RCallback &function);
     };
 }
 

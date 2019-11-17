@@ -11,7 +11,7 @@
 #include "core_define.h"
 
 namespace gc {
-    CLASS_BEGIN_N(_Map, RefObject)
+    CLASS_BEGIN_N(_Map, Object)
 
         std::map<std::string, Variant> _map;
 
@@ -67,7 +67,7 @@ namespace gc {
         }
 
     protected:
-        ON_LOADED_BEGIN(cls, RefObject)
+        ON_LOADED_BEGIN(cls, Object)
             ADD_METHOD(cls, _Map, get);
             ADD_METHOD(cls, _Map, set);
             ADD_METHOD(cls, _Map, erase);

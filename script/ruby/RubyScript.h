@@ -28,11 +28,19 @@ namespace gscript {
     class RubyScript : public gc::Script {
         std::string context_root;
         mrb_state *mrb;
-        
+
         void _setup(const char *root) const;
+
+        static mrb_value callFunction(struct mrb_state *mrb, mrb_value);
+
+        gc::Variant _apply(const mrb_value &value, const gc::StringName &name, const gc::Variant **params, int count);
+
+        friend class RubyClass;
+        friend class RubyInstance;
         
     protected:
         virtual gc::ScriptClass *makeClass() const;
+        void defineFunction(const gc::StringName &name, const gc::RCallback &function);
     public:
         RubyScript();
         ~RubyScript();
@@ -46,6 +54,8 @@ namespace gscript {
         void addEnvPath(const char *path);
         gc::Variant run(const char *filepath) const;
         gc::Variant runScript(const char *script) const;
+
+        gc::Variant apply(const gc::StringName &name, const gc::Variant **params, int count);
         _FORCE_INLINE_ mrb_state *getMRB() {
             return mrb;
         }
@@ -85,11 +95,16 @@ namespace gscript {
     CLASS_END
     
     CLASS_BEGIN_N(RubyNativeObject, gc::NativeObject)
-public:
-    _FORCE_INLINE_ RubyNativeObject() {}
-    RubyNativeObject(void *native);
-    virtual void setNative(void *native);
-    ~RubyNativeObject();
+
+        mrb_state *mrb;
+    public:
+
+        virtual void missMethod(const gc::StringName &name, gc::Variant *result, const gc::Variant **params, int count);
+
+        RubyNativeObject() {};
+        RubyNativeObject(void *native, mrb_state *mrb);
+        virtual void setNative(void *native);
+        ~RubyNativeObject();
     CLASS_END
 }
 

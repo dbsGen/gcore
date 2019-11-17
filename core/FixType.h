@@ -11,7 +11,7 @@
 
 #include <string>
 #include <sstream>
-#include "Object.h"
+#include "Base.h"
 #include "core_define.h"
 
 namespace gc {

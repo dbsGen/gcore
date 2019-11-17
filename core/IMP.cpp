@@ -15,7 +15,7 @@
 #include "Method.h"
 #include "MethodImp.h"
 #include "Property.h"
-#include "Object.h"
+#include "Base.h"
 #include "Callback.h"
 #include "script/Script.h"
 #include "Array.h"
@@ -127,7 +127,7 @@ struct Object::Scripts  {
     Scripts() {}
     ~Scripts() {
         for (auto it = scripts.begin(), _e = scripts.end(); it != _e; ++it) {
-            (*it)->setTarget(NULL, false);
+            (*it)->setTarget(NULL);
         }
     }
 };
@@ -180,7 +180,7 @@ void Object::apply(const StringName &name, Variant *result, const Variant **para
 }
 #endif
 
-void Object::call(const StringName &name, Variant *result, const Variant **params, int count) {
+void Base::call(const StringName &name, Variant *result, const Variant **params, int count) {
     const Method *method = getInstanceClass()->getMethod(name);
     if (method) {
         if (result) {
@@ -189,10 +189,12 @@ void Object::call(const StringName &name, Variant *result, const Variant **param
         else {
             method->call(this, params, count);
         }
+    }else {
+        missMethod(name, result, params, count);
     }
 }
 
-bool Object::copy(const Object *other) {
+bool Base::copy(const Object *other) {
     if (other->getInstanceClass()->isTypeOf(getInstanceClass())) {
         _copy(other);
         return true;
@@ -200,28 +202,8 @@ bool Object::copy(const Object *other) {
     return false;
 }
 
-Variant Object::var()  {
+Variant Base::var()  {
     return Variant(this);
-}
-
-
-void Object::pushOnDestroy(ActionCallback callback, void *data) {
-    if (!on_destroy) on_destroy = new ActionManager;
-    on_destroy->push(callback, data);
-}
-void Object::removeOnDestroy(ActionCallback callback, void *data) {
-    if (on_destroy)
-        on_destroy->remove(callback, data);
-}
-
-Object::~Object() {
-    if (on_destroy) {
-        on_destroy->operator()(this);
-        delete on_destroy;
-    }
-    if (scripts_container) {
-        delete scripts_container;
-    }
 }
 
 //template <typename T>
@@ -357,7 +339,7 @@ Variant::Type Variant::getType() const {
 void Variant::release() {
     switch (type) {
         case TypeReference: {
-            get<RefObject>()->release();
+            get<Object>()->release();
             break;
         }
         case TypeMemory: {
@@ -390,9 +372,9 @@ void Variant::retain(const u_value &value, const Class *class_type, int8_t type)
             type = TypeDouble;
         }else if (class_type == StringName::getClass()) {
             type = TypeStringName;
-        }else if (class_type->isTypeOf(RefObject::getClass())) {
-            type = TypeReference;
         }else if (class_type->isTypeOf(Object::getClass())) {
+            type = TypeReference;
+        }else if (class_type->isTypeOf(Base::getClass())) {
             type = TypeObject;
         }else {
             type = TypePointer;
@@ -400,7 +382,7 @@ void Variant::retain(const u_value &value, const Class *class_type, int8_t type)
     }
     switch (type) {
         case TypeReference: {
-            static_cast<RefObject *>(value.v_pointer)->retain();
+            static_cast<Object *>(value.v_pointer)->retain();
             this->value = value;
             break;
         }
@@ -458,7 +440,7 @@ Variant::Variant(bool n) : Variant()  {
     class_type = Boolean::getClass();
 }
 
-Variant::Variant(const Object *obj) : Variant() {
+Variant::Variant(const Base *obj) : Variant() {
     if (obj) {
         class_type = obj->getInstanceClass();
         retain(u_value{v_pointer: (void*)obj}, class_type);
@@ -518,8 +500,8 @@ Variant::operator const char *() const {
     return "(NULL)";
 }
 
-Variant::operator Object *() const {
-    return get<Object>();
+Variant::operator Base *() const {
+    return get<Base>();
 }
 
 Variant::Variant(const char *str) : Variant() {
@@ -534,15 +516,12 @@ Variant ptr(void *pointer) {
 
 void Reference::release() {
     if (ptr) {
-        if (ptr->cast_to<RefObject>()->release() == 0)
-            goto r_del;
+        if (ptr->release() == 0) {
+            delete ptr;
+            ptr = NULL;
+            return;
+        }
     }
-    goto r_end;
-    r_del:
-    delete ptr;
-    ptr = NULL;
-    r_end:
-    return;
 }
 
 string Reference::str() const {
@@ -552,14 +531,7 @@ string Reference::str() const {
 }
 
 void Reference::retain() {
-    if (ptr) {
-        RefObject *obj = ptr->cast_to<RefObject>();
-        if (obj)
-            obj->retain();
-        else {
-            ptr = NULL;
-        }
-    }
+    IV(ptr, retain());
 }
 
 
@@ -576,9 +548,7 @@ Reference::Reference(const Variant &other) {
 Reference& Reference::operator=(Object *p) {
     release();
     ptr = p;
-    if (ptr) {
-        ptr->cast_to<RefObject>()->retain();
-    }
+    IV(ptr, retain());
     return *this;
 }
 
@@ -958,6 +928,65 @@ void ClassDB::loadClasses() {
     _Array::getClass();
     _Map::getClass();
 }
+
+
+void EventManager::EventHandler::operator<<(const gc::RCallback &cb) {
+    auto it = manager.events.find(name);
+    if (it == manager.events.end()) {
+        manager.events[name] = CallbackStack();
+    }
+    CallbackStack &callStack = manager.events[name];
+    callStack.push_back(cb);
+}
+
+void EventManager::EventHandler::operator>>(const gc::RCallback &cb) {
+    auto it = manager.events.find(name);
+    if (it != manager.events.end()) {
+        it->second.remove(cb);
+    }
+}
+
+void EventManager::EventHandler::call(const variant_vector &variants) const {
+    auto it = manager.events.find(name);
+    if (it != manager.events.end()) {
+        CallbackStack &callbacks = it->second;
+        for (auto it1 = callbacks.begin(); it1 != callbacks.end(); ++it1) {
+            if (*it1) {
+                it1->get()->cast_to<Callback>()->invoke(variants);
+            }
+        }
+    }
+}
+
+void Object::on(const StringName &name, const RCallback &callback) {
+    if (event_manager) {
+        event_manager = new EventManager();
+    }
+    event_manager->operator[](name) << callback;
+}
+
+
+void Object::off(const StringName &name, const RCallback &callback) {
+    if (event_manager) {
+        event_manager->operator[](name) >> callback;
+    }
+}
+
+void Object::_trigger(const StringName &name, const variant_vector &params) {
+    if (event_manager) {
+        event_manager->operator[](name).call(params);
+    }
+}
+
+Object::~Object() {
+    trigger(EVENT_DESTROY);
+    if (event_manager) delete event_manager;
+    if (scripts_container) delete scripts_container;
+}
+
+const StringName Object::EVENT_DESTROY("DESTROY");
+const StringName Base::KEY_INITIALIZE("initialize");
+
 
 StringName StringName::_null;
 

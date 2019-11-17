@@ -33,6 +33,8 @@
 
 #endif
 
+#define IV(obj, method) if (obj) obj->method;
+
 // Object
 
 #define new_c(CLASS, T, ...) ({ \
@@ -232,6 +234,7 @@ _FORCE_INLINE_ TYPE(const gc::Variant &var) : TYPE() { \
 #define INITIALIZE(CLASS, PARAMS, PROGRAMS) \
 _FORCE_INLINE_ CLASS(PARAMS):CLASS(){PROGRAMS}
 
+#define NAMESPACE(nc) namespace nc
 
 // ------ LOG
 

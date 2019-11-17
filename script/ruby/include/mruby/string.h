@@ -352,7 +352,9 @@ MRB_API mrb_value mrb_str_dup(mrb_state *mrb, mrb_value str);
 MRB_API mrb_value mrb_str_intern(mrb_state *mrb, mrb_value self);
 
 MRB_API mrb_value mrb_str_to_inum(mrb_state *mrb, mrb_value str, mrb_int base, mrb_bool badcheck);
+MRB_API mrb_value mrb_cstr_to_inum(mrb_state *mrb, const char *s, mrb_int base, mrb_bool badcheck);
 MRB_API double mrb_str_to_dbl(mrb_state *mrb, mrb_value str, mrb_bool badcheck);
+MRB_API double mrb_cstr_to_dbl(mrb_state *mrb, const char *s, mrb_bool badcheck);
 
 /*
  * Returns a converted string type.
@@ -438,6 +440,10 @@ void mrb_regexp_check(mrb_state *mrb, mrb_value obj);
 #define mrb_str_cat2(mrb, str, ptr) mrb_str_cat_cstr(mrb, str, ptr)
 #define mrb_str_buf_cat(mrb, str, ptr, len) mrb_str_cat(mrb, str, ptr, len)
 #define mrb_str_buf_append(mrb, str, str2) mrb_str_cat_str(mrb, str, str2)
+
+#ifdef MRB_UTF8_STRING
+mrb_int mrb_utf8_len(const char *str, mrb_int byte_len);
+#endif
 
 MRB_END_DECL
 

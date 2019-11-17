@@ -1,7 +1,7 @@
 require 'gr/object'
 require 'gr/callback'
 
-class TestObject < gc::Object
+class TestObject < GC::Object
   native 'TestObject'
 
   def call_cb

@@ -17,6 +17,7 @@ namespace gc {
 
     template<class T>
     class Ref;
+    class Base;
 
     class Variant {
         BASE_FINAL_CLASS_DEFINE
@@ -62,7 +63,7 @@ namespace gc {
         static bool isRef(int8_t type);
 
         
-        template<class T = Object>
+        template<class T = Base>
         _FORCE_INLINE_ T *_get() const {
             return value.v_pointer;
         }
@@ -75,6 +76,12 @@ namespace gc {
 
         _FORCE_INLINE_ Variant(void) : type(TypeNull) {
             value.v_pointer = NULL;
+        }
+
+        Variant(Variant &&other) {
+            std::swap(value, other.value);
+            std::swap(type, other.type);
+            std::swap(class_type, other.class_type);
         }
 
         Variant(const Variant &other) : Variant() {
@@ -90,7 +97,7 @@ namespace gc {
             release();
         }
         
-        template<class T = Object>
+        template<class T = Base>
         _FORCE_INLINE_ T *get() const {
             return (T*)operator void *();
         }
@@ -116,7 +123,7 @@ namespace gc {
 
         bool operator==(const Variant &other) const;
 
-        _FORCE_INLINE_ Object *operator->() const {
+        _FORCE_INLINE_ Base *operator->() const {
             return get();
         }
 
@@ -144,7 +151,7 @@ namespace gc {
         
         operator void *() const;
         operator const char *() const;
-        operator Object *() const;
+        operator Base *() const;
         operator StringName() const;
 
         std::string str() const;
@@ -159,7 +166,7 @@ namespace gc {
         Variant(bool);
         Variant(const std::string &);
         Variant(const char *);
-        Variant(const Object*);
+        Variant(const Base*);
         Variant(void*);
         Variant(const StringName &name);
 

@@ -7,7 +7,7 @@
 
 #include "Class.h"
 #include "Define.h"
-#include "Object.h"
+#include "Base.h"
 #include "Ref.h"
 #include "Singleton.h"
 #include "Variant.h"
