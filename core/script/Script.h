@@ -28,7 +28,6 @@ namespace gc {
         
         static pointer_map scripts;
         pointer_map classes;
-        ref_map functions;
         StringName name;
 
     protected:

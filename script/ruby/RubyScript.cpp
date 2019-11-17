@@ -24,6 +24,7 @@
 #include <core/FixType.h>
 #include <core/Map.h>
 #include "RubyScript.h"
+#include <core/Callback.h>
 
 #define SCRIPT ((RubyScript*)getScript())
 
@@ -509,7 +510,14 @@ gc::Variant RubyScript::run(const char *filepath) const {
 }
 
 gc::Variant RubyScript::runScript(const char *script) const {
-    return ruby_r2h(mrb, mrb_load_string(mrb, script));
+    if (mrb->exc) mrb->exc = NULL;
+    mrb_value val = mrb_load_string(mrb, script);
+    if (mrb->exc) {
+        mrb_p(mrb, mrb_obj_value(mrb->exc));
+        mrb->exc = NULL;
+        return gc::Variant::null();
+    }
+    return ruby_r2h(mrb, val);
 }
 
 gc::Variant RubyScript::_apply(const mrb_value &value, const gc::StringName &name, const gc::Variant **params, int count) {
@@ -579,7 +587,21 @@ RubyInstance *RubyScript::newBuff(struct RClass *scls, gc::Object *target, const
 }
 
 void RubyScript::defineFunction(const gc::StringName &name, const gc::RCallback &function) {
-    mrb_define_singleton_method(mrb, mrb->top_self, name.str(), &RubyScript::callFunction, MRB_ARGS_ANY());
+    mrb_value val = ruby_h2r(mrb, function);
+    string insname = "FUN_";
+    insname += name.str();
+    mrb_define_global_const(mrb, insname.c_str(), val);
+    string script = "def ";
+    script += name.str();
+    script += " *argv;";
+    script += insname;
+    script += ".invoke argv;";
+    script += "end";
+    mrb_load_string(mrb, script.c_str());
+    if (mrb->exc) {
+        mrb_p(mrb, mrb_obj_value(mrb->exc));
+        mrb->exc = NULL;
+    }
 }
 
 gc::ScriptInstance *RubyClass::makeInstance() const {

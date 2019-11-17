@@ -136,6 +136,13 @@ TEST(Ruby, RunEnvFile)
     ruby.apply("test", (const Variant **)vs, 1);
     vs[0] = &obj2;
     ruby.apply("test", (const Variant **)vs, 1);
+
+
+    ruby.addFunction("testfn", C([](std::string str){
+        printf("Output : %s\n", str.c_str());
+        EXPECT_EQ(str, "woqu");
+    }));
+    ruby.runScript("testfn 'woqu'");
 }
 
 int main(int argc, char* argv[]) {

@@ -66,7 +66,7 @@ Script::Script(const StringName &name) : name(name) {
 }
 
 void Script::addFunction(const StringName &name, const gc::RCallback &function) {
-    functions[name] = function;
+    defineFunction(name, function);
 }
 
 Variant ScriptClass::call(const StringName &name, const Variant **params, int count) const {
